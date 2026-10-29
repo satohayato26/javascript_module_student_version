@@ -43,78 +43,81 @@ const users = [
   }
 ];
 
-// TODO: 必要なHTML要素を取得してください
-// 例: document.querySelector("#cardList")
+const searchInput = document.querySelector("#searchInput");
+const searchButton = document.querySelector("#searchButton");
+const resultCountElement = document.querySelector("#resultCount");
+const emptyMessageElement = document.querySelector("#emptyMessage");
+const cardListElement = document.querySelector("#cardList");
+const profileCardTemplate = document.querySelector("#profileCardTemplate");
 
-/** NOTE: 必要なHTML要素を取得してからコメントアウトを解除してください */
-// function updateResultCount(count) {
-//   resultCountElement.textContent = `${count}件表示`;
-// }
-
-/** NOTE: 必要なHTML要素を取得してからコメントアウトを解除してください */
-// 検索結果が0件のときのメッセージ表示/非表示を切り替えます。
-// function toggleEmptyMessage(shouldShow) {
-//   emptyMessageElement.classList.toggle("is-hidden", !shouldShow);
-// }
-
-/** NOTE: 必要なHTML要素を取得してからコメントアウトを解除してください */
-// ユーザーデータ1件分のカード要素をテンプレートから生成します。
-// function createCard(user) {
-//   // template要素を複製して、カードの土台を作成します。
-//   const cardFragment = profileCardTemplate.content.cloneNode(true);
-//   const imageElement = cardFragment.querySelector(".profile-image");
-//   const roleElement = cardFragment.querySelector(".profile-role");
-//   const nameElement = cardFragment.querySelector(".profile-name");
-//   const descriptionElement = cardFragment.querySelector(".profile-description");
-
-//   // 渡されたユーザー情報でカード内容を埋めます。
-//   imageElement.src = user.imageUrl;
-//   imageElement.alt = `${user.name}のプロフィール画像`;
-//   roleElement.textContent = user.role;
-//   nameElement.textContent = user.name;
-//   descriptionElement.textContent = user.description;
-
-//   return cardFragment;
-// }
-
-// TODO: 一覧表示を行う関数を作成してください
-// 要件:
-// - 引数で受け取ったデータ配列をもとにカードを表示する
-// - cardListの中身を更新する
-// - resultCountに表示件数を反映する
-// - データが0件なら emptyMessage を表示する
-function renderCards(userList) {
-  // 再描画前に既存のカードをクリアします。
-  // cardListElement.innerHTML = "";
-  /**
-   * TODO: ユーザーごとにカードを作成してDOMに追加します。
-   * DOMへの追加メソッドはappendChildメソッドを使用します。
-   */
-
-  // TODO: 件数表示と空状態メッセージを最新状態に同期します。
+function updateResultCount(count) {
+  resultCountElement.textContent = `${count}件表示`;
 }
 
-// TODO: 検索・絞り込みを行う関数を作成してください
-// 要件:
-// - 空文字の場合は全件表示
-// - 名前または役職にキーワードを含むユーザーのみを返します。
+
+function toggleEmptyMessage(shouldShow) {
+  emptyMessageElement.classList.toggle("is-hidden", !shouldShow);
+}
+
+
+function createCard(user) {
+
+  const cardFragment = profileCardTemplate.content.cloneNode(true);
+  const imageElement = cardFragment.querySelector(".profile-image");
+  const roleElement = cardFragment.querySelector(".profile-role");
+  const nameElement = cardFragment.querySelector(".profile-name");
+  const descriptionElement = cardFragment.querySelector(".profile-description");
+
+  imageElement.src = user.imageUrl;
+  imageElement.alt = `${user.name}のプロフィール画像`;
+  roleElement.textContent = user.role;
+  nameElement.textContent = user.name;
+  descriptionElement.textContent = user.description;
+
+  return cardFragment;
+}
+
+
+function renderCards(userList) {
+
+  cardListElement.innerHTML = "";
+
+  userList.forEach((user) => {
+    const card = createCard(user);
+    cardListElement.appendChild(card);
+  });
+
+
+  updateResultCount(userList.length);
+  toggleEmptyMessage(userList.length === 0);
+}
+
+
 function filterUsers(keyword) {
-  // 前後空白を除去し、大文字小文字を区別しない比較用に正規化します。
+
   const normalizedKeyword = keyword.trim().toLowerCase();
 
-  // TODO: 空文字の場合は全件表示します。
+  if (normalizedKeyword === "") {
+    return users;
+  }
 
-  // TODO: 名前または役職にキーワードを含むユーザーのみを返します。
+  return users.filter((user) => {
+    return (
+      user.name.toLowerCase().includes(normalizedKeyword) ||
+      user.role.toLowerCase().includes(normalizedKeyword)
+    );
+  });
 }
 
-// TODO: 検索入力の現在値を使って一覧を再描画してください
-// 要件:
-// - 入力値の取得
-// - filterUsers を呼び出して一覧を再描画します。
+
 function handleSearch() {
-  // TODO: 入力値の取得
-  // TODO: filterUsers を呼び出して一覧を再描画します。
+
+  const keyword = searchInput.value;
+
+  const filteredUsers = filterUsers(keyword);
+  renderCards(filteredUsers);
 }
 
-// TODO: 初回表示処理を実装してください
-// 画面を開いたときに users が一覧表示されるようにする
+
+searchButton.addEventListener("click", handleSearch);
+renderCards(users);
